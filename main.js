@@ -1,0 +1,64 @@
+// ---- Nav scroll effect ----
+const nav = document.getElementById('nav');
+let lastScroll = 0;
+
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ---- Mobile nav toggle ----
+const toggle = document.getElementById('navToggle');
+const links = document.getElementById('navLinks');
+
+toggle.addEventListener('click', () => {
+  toggle.classList.toggle('active');
+  links.classList.toggle('open');
+});
+
+links.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    toggle.classList.remove('active');
+    links.classList.remove('open');
+  });
+});
+
+// ---- Scroll reveal ----
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -40px 0px' };
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, observerOptions);
+
+// Add fade-up to animatable elements
+document.querySelectorAll(
+  '.approach-card, .system-card, .process-step, .result-card, .section-header, .cta-content'
+).forEach((el, i) => {
+  el.classList.add('fade-up');
+  el.style.transitionDelay = `${(i % 4) * 0.08}s`;
+  observer.observe(el);
+});
+
+// ---- Smooth scroll for anchor links ----
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// ---- Form handling ----
+const form = document.getElementById('contactForm');
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const btn = form.querySelector('button');
+  btn.textContent = 'Sent — We\'ll be in touch.';
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+});
