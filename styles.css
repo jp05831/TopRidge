@@ -141,6 +141,12 @@ a {
   letter-spacing: -0.02em;
 }
 
+.logo-img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
 .logo-mark {
   color: var(--accent);
 }
