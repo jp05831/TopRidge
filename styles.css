@@ -864,7 +864,7 @@ a {
   font-size: 2.8rem;
   font-weight: 800;
   letter-spacing: -0.04em;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   line-height: 1;
 }
 
@@ -1015,8 +1015,13 @@ a {
 
 @media (max-width: 768px) {
   .nav {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
+    background: var(--bg-primary);
+    backdrop-filter: none;
+  }
+
+  .nav.scrolled {
+    background: var(--bg-primary);
+    backdrop-filter: none;
   }
 
   .nav-links {
@@ -1026,6 +1031,9 @@ a {
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
     background: var(--bg-primary);
     border: none;
     flex-direction: column;
@@ -1033,6 +1041,7 @@ a {
     justify-content: center;
     gap: 28px;
     z-index: 99;
+    overflow-y: auto;
   }
   
   .nav-links.open {

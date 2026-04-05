@@ -11,8 +11,9 @@ const toggle = document.getElementById('navToggle');
 const links = document.getElementById('navLinks');
 
 toggle.addEventListener('click', () => {
+  const isOpen = links.classList.toggle('open');
   toggle.classList.toggle('active');
-  links.classList.toggle('open');
+  if (isOpen) lockScroll(); else unlockScroll();
 });
 
 // Close mobile menu when clicking a non-dropdown link
@@ -21,6 +22,7 @@ links.querySelectorAll('a').forEach(a => {
     a.addEventListener('click', () => {
       toggle.classList.remove('active');
       links.classList.remove('open');
+      unlockScroll();
       document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
     });
   }
@@ -36,14 +38,9 @@ document.querySelectorAll('.nav-dropdown-toggle').forEach(btn => {
   });
 });
 
-// Close mobile menu on scroll
-window.addEventListener('scroll', () => {
-  if (links.classList.contains('open')) {
-    toggle.classList.remove('active');
-    links.classList.remove('open');
-    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
-  }
-});
+// Lock body scroll when mobile menu is open
+const lockScroll = () => document.body.style.overflow = 'hidden';
+const unlockScroll = () => document.body.style.overflow = '';
 
 // ---- Scroll reveal ----
 const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -40px 0px' };
