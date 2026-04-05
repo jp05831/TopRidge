@@ -15,11 +15,34 @@ toggle.addEventListener('click', () => {
   links.classList.toggle('open');
 });
 
+// Close mobile menu when clicking a non-dropdown link
 links.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
+  if (!a.classList.contains('nav-dropdown-toggle')) {
+    a.addEventListener('click', () => {
+      toggle.classList.remove('active');
+      links.classList.remove('open');
+      document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+    });
+  }
+});
+
+// Mobile dropdown toggle (tap to expand/collapse)
+document.querySelectorAll('.nav-dropdown-toggle').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768) {
+      e.preventDefault();
+      btn.closest('.nav-dropdown').classList.toggle('open');
+    }
+  });
+});
+
+// Close mobile menu on scroll
+window.addEventListener('scroll', () => {
+  if (links.classList.contains('open')) {
     toggle.classList.remove('active');
     links.classList.remove('open');
-  });
+    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+  }
 });
 
 // ---- Scroll reveal ----
