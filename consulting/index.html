@@ -9,6 +9,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
+  <style>
+    .consult-cards .approach-card {
+      background: linear-gradient(165deg, #f0f4ff 0%, #ffffff 100%);
+      border-left: 3px solid var(--accent);
+      border-color: var(--border);
+      border-left-color: var(--accent);
+    }
+    .consult-cards .approach-card:hover {
+      border-left-color: #6366f1;
+      box-shadow: 0 8px 30px rgba(37, 99, 235, 0.08);
+    }
+  </style>
 </head>
 <body>
   <nav class="nav" id="nav">
@@ -94,7 +106,7 @@
         <h2>Clarity, not fluff.</h2>
         <p class="section-desc">You walk away with a clear picture of where things stand, what's holding you back, and exactly what to do next — whether you work with us or handle it yourself.</p>
       </div>
-      <div class="approach-grid">
+      <div class="approach-grid consult-cards">
         <div class="approach-card">
           <div class="approach-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -169,7 +181,7 @@
         <h2>Not sure where to start?<br>That's exactly what this is for.</h2>
         <p>Book a strategy session and walk away with a clear plan — no commitment beyond the call.</p>
         <div class="hero-actions" style="justify-content: center;">
-          <a href="/#contact" class="btn btn-primary">Book a Strategy Session — $180</a>
+          <a href="/#contact" class="btn btn-primary">Book a Strategy Session</a>
         </div>
       </div>
     </div>
