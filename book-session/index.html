@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
-  <script src="https://js.stripe.com/v3/"></script>
+  <!-- Stripe loaded via Payment Link -->
   <style>
     .book-form-section {
       padding: 120px 0 80px;
@@ -291,8 +291,7 @@
   </footer>
   <script src="../main.js"></script>
   <script>
-    const stripe = Stripe('pk_live_51TJ4dB0qdkJF1jutM0UpNoMPfoeUNlbQBdCaCnoVhuY8nMhtyP2vxMAiPsVQlcQnNzuQAmZwgjvkpoRBCsYXWU1U00bnomg5PV');
-
+    const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/28EdR1cuK14r8v2eXb1oI00';
     const form = document.getElementById('bookingForm');
 
     form.addEventListener('submit', async function(e) {
@@ -328,7 +327,6 @@
       }
 
       if (!valid) {
-        // Scroll to first error
         const firstError = form.querySelector('.form-group.error');
         if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
@@ -346,7 +344,7 @@
         anything_else: document.getElementById('anything_else').value.trim()
       };
 
-      // Store form data in localStorage so it persists through checkout
+      // Store form data in localStorage
       localStorage.setItem('topridge_booking', JSON.stringify(formData));
 
       // Send to webhook if configured
@@ -360,29 +358,16 @@
           });
         } catch (err) {
           console.warn('Webhook send failed:', err);
-          // Don't block checkout on webhook failure
         }
       }
 
-      // Redirect to Stripe Checkout
+      // Redirect to Stripe Payment Link with prefilled email
       const submitBtn = form.querySelector('.form-submit-btn');
       submitBtn.textContent = 'Redirecting to payment...';
       submitBtn.disabled = true;
 
-      const { error } = await stripe.redirectToCheckout({
-        lineItems: [{ price: 'price_1TK27d0qdkJF1jutbYHCBDoA', quantity: 1 }],
-        mode: 'payment',
-        successUrl: window.location.origin + '/book-session/success',
-        cancelUrl: window.location.origin + '/book-session',
-        customerEmail: formData.email
-      });
-
-      if (error) {
-        submitBtn.textContent = 'Continue to Payment →';
-        submitBtn.disabled = false;
-        alert('Something went wrong. Please try again.');
-        console.error(error);
-      }
+      const email = encodeURIComponent(formData.email);
+      window.location.href = STRIPE_PAYMENT_LINK + '?prefilled_email=' + email;
     });
   </script>
 </body>
