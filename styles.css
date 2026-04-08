@@ -872,7 +872,7 @@ a {
   font-size: 1.3rem;
   color: rgba(255, 255, 255, 0.35);
   text-decoration: line-through;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-weight: 500;
 }
 
@@ -932,6 +932,44 @@ a {
 .pricing-card .btn-ghost:hover {
   background: var(--bg-secondary);
   border-color: rgba(0, 0, 0, 0.2);
+}
+
+.pricing-premium {
+  background: linear-gradient(165deg, #0f172a 0%, #1e293b 100%);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #f1f5f9;
+}
+.pricing-premium::before {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), transparent 60%);
+}
+.pricing-premium:hover {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 8px 40px rgba(99, 102, 241, 0.12);
+}
+.pricing-premium h3,
+.pricing-premium .pricing-price {
+  color: #ffffff;
+}
+.pricing-premium .pricing-desc {
+  color: rgba(241, 245, 249, 0.7);
+}
+.pricing-premium .pricing-features li {
+  color: rgba(241, 245, 249, 0.85);
+}
+.pricing-premium .pricing-features li::before {
+  color: #818cf8;
+}
+.pricing-premium .pricing-price-period {
+  color: rgba(241, 245, 249, 0.5);
+}
+.pricing-premium .btn-ghost {
+  border-color: rgba(129, 140, 248, 0.4);
+  color: #c7d2fe;
+}
+.pricing-premium .btn-ghost:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(129, 140, 248, 0.6);
+  color: #ffffff;
 }
 
 /* ---- Fit List ---- */

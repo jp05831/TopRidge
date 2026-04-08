@@ -135,55 +135,6 @@
       background: var(--bg-card-hover);
     }
 
-    /* Contact info step */
-    .contact-fields {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .contact-field label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-    .contact-field label .required {
-      color: #dc2626;
-      margin-left: 2px;
-    }
-    .contact-field input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-family: var(--font-sans);
-      font-size: 0.95rem;
-      color: var(--text-primary);
-      background: var(--bg-primary);
-      transition: border-color var(--transition), box-shadow var(--transition);
-      outline: none;
-    }
-    .contact-field input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-dim);
-    }
-    .contact-field input::placeholder {
-      color: var(--text-muted);
-    }
-    .contact-field.error input {
-      border-color: #dc2626;
-    }
-    .contact-field .field-error {
-      color: #dc2626;
-      font-size: 0.85rem;
-      margin-top: 6px;
-      display: none;
-    }
-    .contact-field.error .field-error {
-      display: block;
-    }
-
     /* Success state */
     .success-state {
       display: none;
@@ -309,35 +260,10 @@
             <div class="step-error">Please answer this question before continuing.</div>
             <div class="step-actions">
               <button type="button" class="btn btn-back" onclick="prevStep(5)">← Back</button>
-              <button type="button" class="btn btn-primary" onclick="nextStep(5)">Continue →</button>
+              <button type="button" class="btn btn-primary" onclick="submitForm()">Submit Application →</button>
             </div>
           </div>
 
-          <!-- Step 6: Contact info -->
-          <div class="step" data-step="6">
-            <div class="step-question">Last step — how can we reach you?</div>
-            <div class="contact-fields">
-              <div class="contact-field">
-                <label for="c_name">Name <span class="required">*</span></label>
-                <input type="text" id="c_name" placeholder="Your full name">
-                <div class="field-error">Please enter your name.</div>
-              </div>
-              <div class="contact-field">
-                <label for="c_email">Email <span class="required">*</span></label>
-                <input type="email" id="c_email" placeholder="you@example.com">
-                <div class="field-error">Please enter a valid email.</div>
-              </div>
-              <div class="contact-field">
-                <label for="c_phone">Phone <span class="required">*</span></label>
-                <input type="tel" id="c_phone" placeholder="(555) 123-4567">
-                <div class="field-error">Please enter your phone number.</div>
-              </div>
-            </div>
-            <div class="step-actions">
-              <button type="button" class="btn btn-back" onclick="prevStep(6)">← Back</button>
-              <button type="button" class="btn btn-primary" id="submitBtn" onclick="submitForm()">Submit Application →</button>
-            </div>
-          </div>
         </div>
 
         <!-- Success state -->
@@ -349,6 +275,7 @@
           </div>
           <h2>Application received.</h2>
           <p>Next step is to book a quick call. The scheduling window should appear momentarily.</p>
+          <p style="margin-top: 12px;"><a href="#" id="calendlyFallback" style="color: var(--accent); text-decoration: underline;">If it doesn't, click here to continue.</a></p>
         </div>
 
       </div>
@@ -368,19 +295,12 @@
   </footer>
   <script src="../../main.js"></script>
   <script>
-    var totalSteps = 6;
+    var totalSteps = 5;
 
     function updateProgress(step) {
-      // Show "Question X of 5" for q steps, "Final step" for contact
-      var label = document.getElementById('currentStep');
       var fill = document.getElementById('progressFill');
-      if (step <= 5) {
-        document.querySelector('.progress-text').innerHTML = 'Question <span id="currentStep">' + step + '</span> of 5';
-        fill.style.width = (step / totalSteps * 100) + '%';
-      } else {
-        document.querySelector('.progress-text').innerHTML = 'Final step';
-        fill.style.width = '100%';
-      }
+      document.querySelector('.progress-text').innerHTML = 'Question <span id="currentStep">' + step + '</span> of ' + totalSteps;
+      fill.style.width = (step / totalSteps * 100) + '%';
     }
 
     function showStep(n) {
@@ -392,23 +312,17 @@
       var target = document.querySelector('.step[data-step="' + n + '"]');
       if (target) target.classList.add('active');
       updateProgress(n);
-      // Focus textarea or first input
       setTimeout(function() {
         var ta = target.querySelector('textarea');
-        var inp = target.querySelector('input');
         if (ta) ta.focus();
-        else if (inp) inp.focus();
       }, 100);
     }
 
     function nextStep(from) {
-      // Validate current step
-      if (from <= 5) {
-        var textarea = document.getElementById('q' + from);
-        if (!textarea.value.trim()) {
-          textarea.closest('.step').classList.add('error');
-          return;
-        }
+      var textarea = document.getElementById('q' + from);
+      if (!textarea.value.trim()) {
+        textarea.closest('.step').classList.add('error');
+        return;
       }
       showStep(from + 1);
     }
@@ -417,28 +331,23 @@
       showStep(from - 1);
     }
 
+    function openCalendly() {
+      if (typeof Calendly !== 'undefined') {
+        Calendly.initPopupWidget({
+          url: 'https://calendly.com/topridge/advisory-intro-call?hide_event_type_details=1&hide_gdpr_banner=1'
+        });
+      }
+    }
+
     function submitForm() {
-      // Validate contact fields
-      var valid = true;
-      var fields = document.querySelectorAll('.contact-field');
-      for (var i = 0; i < fields.length; i++) {
-        fields[i].classList.remove('error');
+      // Validate last question
+      var textarea = document.getElementById('q5');
+      if (!textarea.value.trim()) {
+        textarea.closest('.step').classList.add('error');
+        return;
       }
 
-      var name = document.getElementById('c_name');
-      var email = document.getElementById('c_email');
-      var phone = document.getElementById('c_phone');
-
-      if (!name.value.trim()) { name.closest('.contact-field').classList.add('error'); valid = false; }
-      if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { email.closest('.contact-field').classList.add('error'); valid = false; }
-      if (!phone.value.trim()) { phone.closest('.contact-field').classList.add('error'); valid = false; }
-
-      if (!valid) return;
-
       var formData = {
-        name: name.value.trim(),
-        email: email.value.trim(),
-        phone: phone.value.trim(),
         q1_working_on: document.getElementById('q1').value.trim(),
         q2_improve_fix: document.getElementById('q2').value.trim(),
         q3_getting_clients: document.getElementById('q3').value.trim(),
@@ -466,18 +375,19 @@
       successEl.classList.add('active');
 
       // Auto-open Calendly popup after short delay
-      setTimeout(function() {
-        if (typeof Calendly !== 'undefined') {
-          Calendly.initPopupWidget({
-            url: 'https://calendly.com/topridge/advisory-intro-call?hide_event_type_details=1&hide_gdpr_banner=1',
-            prefill: {
-              name: formData.name,
-              email: formData.email
-            }
-          });
-        }
-      }, 800);
+      setTimeout(openCalendly, 800);
     }
+
+    // Fallback link
+    document.addEventListener('DOMContentLoaded', function() {
+      var fallback = document.getElementById('calendlyFallback');
+      if (fallback) {
+        fallback.addEventListener('click', function(e) {
+          e.preventDefault();
+          openCalendly();
+        });
+      }
+    });
   </script>
 </body>
 </html>
