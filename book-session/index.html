@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
-  <!-- Stripe loaded via Payment Link -->
   <style>
     .book-form-section {
       padding: 120px 0 80px;
@@ -42,6 +41,10 @@
       font-weight: 500;
       color: var(--text-primary);
       margin-bottom: 8px;
+    }
+    .form-group label .required {
+      color: #dc2626;
+      margin-left: 2px;
     }
     .form-group label .optional {
       color: var(--text-muted);
@@ -76,8 +79,6 @@
     .form-group textarea::placeholder {
       color: var(--text-muted);
     }
-
-    /* Revenue radio boxes */
     .revenue-options {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -123,7 +124,6 @@
       border-color: var(--border-hover);
       background: var(--bg-secondary);
     }
-
     .form-submit-btn {
       width: 100%;
       margin-top: 8px;
@@ -181,27 +181,32 @@
     <div class="container">
       <div class="book-form-wrapper">
         <div class="book-form-header">
-          <span class="section-tag">Strategy Session — $180</span>
           <h1>A few details before we get started.</h1>
           <p>Fill this out so we can make the most of our time together. After submitting, you'll be taken to a secure payment page.</p>
         </div>
 
-        <form id="bookingForm" novalidate>
+        <form id="bookingForm" action="javascript:void(0);" onsubmit="return false;">
           <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" placeholder="Your full name" required>
+            <label for="name">Name <span class="required">*</span></label>
+            <input type="text" id="name" name="name" placeholder="Your full name">
             <div class="form-error">Please enter your name.</div>
           </div>
 
           <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="you@example.com" required>
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" name="email" placeholder="you@example.com">
             <div class="form-error">Please enter a valid email address.</div>
           </div>
 
           <div class="form-group">
-            <label for="type">Business or Individual?</label>
-            <select id="type" name="type" required>
+            <label for="phone">Phone Number <span class="required">*</span></label>
+            <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567">
+            <div class="form-error">Please enter your phone number.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="type">Business or Individual? <span class="required">*</span></label>
+            <select id="type" name="type">
               <option value="" disabled selected>Select one</option>
               <option value="business">Business</option>
               <option value="individual">Individual</option>
@@ -210,16 +215,16 @@
           </div>
 
           <div class="form-group">
-            <label for="working_on">What are you working on?</label>
-            <textarea id="working_on" name="working_on" placeholder="Tell us about your project, business, or idea..." required></textarea>
+            <label for="working_on">What are you working on? <span class="required">*</span></label>
+            <textarea id="working_on" name="working_on" placeholder="Tell us about your project, business, or idea..."></textarea>
             <div class="form-error">Please tell us what you're working on.</div>
           </div>
 
           <div class="form-group">
-            <label>Current monthly revenue or stage</label>
+            <label>Current monthly revenue or stage <span class="required">*</span></label>
             <div class="revenue-options">
               <div class="revenue-option">
-                <input type="radio" id="rev1" name="revenue" value="$0 - $1,000" required>
+                <input type="radio" id="rev1" name="revenue" value="$0 - $1,000">
                 <label for="rev1">$0 – $1,000</label>
               </div>
               <div class="revenue-option">
@@ -255,8 +260,8 @@
           </div>
 
           <div class="form-group">
-            <label for="main_problem">Main problem you want help with</label>
-            <textarea id="main_problem" name="main_problem" placeholder="What's the #1 thing you'd like to solve or figure out?" required></textarea>
+            <label for="main_problem">Main problem you want help with <span class="required">*</span></label>
+            <textarea id="main_problem" name="main_problem" placeholder="What's the #1 thing you'd like to solve or figure out?"></textarea>
             <div class="form-error">Please describe your main problem.</div>
           </div>
 
@@ -266,13 +271,13 @@
           </div>
 
           <div class="form-group">
-            <label for="anything_else">Anything specific you want to cover?</label>
-            <textarea id="anything_else" name="anything_else" placeholder="Topics, questions, specific areas of your business..." required></textarea>
+            <label for="anything_else">Anything specific you want to cover? <span class="required">*</span></label>
+            <textarea id="anything_else" name="anything_else" placeholder="Topics, questions, specific areas of your business..."></textarea>
             <div class="form-error">Please let us know what you'd like to cover.</div>
           </div>
 
-          <button type="submit" class="btn btn-primary form-submit-btn">Continue to Payment →</button>
-          <p class="form-price-note">You'll be redirected to a secure Stripe checkout page for $180.</p>
+          <button type="button" id="submitBtn" class="btn btn-primary form-submit-btn">Continue to Payment →</button>
+          <p class="form-price-note">You'll be redirected to a secure Stripe checkout page.</p>
         </form>
       </div>
     </div>
@@ -291,84 +296,85 @@
   </footer>
   <script src="../main.js"></script>
   <script>
-    const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/28EdR1cuK14r8v2eXb1oI00';
-    const form = document.getElementById('bookingForm');
+    (function() {
+      var STRIPE_URL = 'https://buy.stripe.com/28EdR1cuK14r8v2eXb1oI00';
+      var btn = document.getElementById('submitBtn');
+      var form = document.getElementById('bookingForm');
 
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-      // Clear previous errors
-      form.querySelectorAll('.form-group').forEach(g => g.classList.remove('error'));
+        // Clear previous errors
+        var groups = form.querySelectorAll('.form-group');
+        for (var i = 0; i < groups.length; i++) {
+          groups[i].classList.remove('error');
+        }
 
-      // Validate required fields
-      let valid = true;
-      const requiredFields = ['name', 'email', 'type', 'working_on', 'main_problem', 'anything_else'];
-      
-      requiredFields.forEach(field => {
-        const el = document.getElementById(field);
-        if (!el.value.trim()) {
-          el.closest('.form-group').classList.add('error');
+        var valid = true;
+
+        // Check text/email/tel/select fields
+        var requiredFields = ['name', 'email', 'phone', 'type', 'working_on', 'main_problem', 'anything_else'];
+        for (var i = 0; i < requiredFields.length; i++) {
+          var el = document.getElementById(requiredFields[i]);
+          if (!el.value.trim()) {
+            el.closest('.form-group').classList.add('error');
+            valid = false;
+          }
+        }
+
+        // Validate email format
+        var emailVal = document.getElementById('email').value.trim();
+        if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+          document.getElementById('email').closest('.form-group').classList.add('error');
           valid = false;
         }
-      });
 
-      // Validate email format
-      const emailEl = document.getElementById('email');
-      if (emailEl.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
-        emailEl.closest('.form-group').classList.add('error');
-        valid = false;
-      }
-
-      // Validate revenue radio
-      const revenueChecked = document.querySelector('input[name="revenue"]:checked');
-      if (!revenueChecked) {
-        document.querySelector('.revenue-options').closest('.form-group').classList.add('error');
-        valid = false;
-      }
-
-      if (!valid) {
-        const firstError = form.querySelector('.form-group.error');
-        if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-      }
-
-      // Collect form data
-      const formData = {
-        name: document.getElementById('name').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        type: document.getElementById('type').value,
-        working_on: document.getElementById('working_on').value.trim(),
-        revenue: revenueChecked.value,
-        main_problem: document.getElementById('main_problem').value.trim(),
-        website: document.getElementById('website').value.trim(),
-        anything_else: document.getElementById('anything_else').value.trim()
-      };
-
-      // Store form data in localStorage
-      localStorage.setItem('topridge_booking', JSON.stringify(formData));
-
-      // Send to webhook if configured
-      const webhookUrl = window.TOPRIDGE_WEBHOOK_URL;
-      if (webhookUrl) {
-        try {
-          await fetch(webhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-          });
-        } catch (err) {
-          console.warn('Webhook send failed:', err);
+        // Validate revenue
+        var revenueChecked = document.querySelector('input[name="revenue"]:checked');
+        if (!revenueChecked) {
+          document.querySelector('.revenue-options').closest('.form-group').classList.add('error');
+          valid = false;
         }
-      }
 
-      // Redirect to Stripe Payment Link with prefilled email
-      const submitBtn = form.querySelector('.form-submit-btn');
-      submitBtn.textContent = 'Redirecting to payment...';
-      submitBtn.disabled = true;
+        if (!valid) {
+          var firstErr = form.querySelector('.form-group.error');
+          if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
 
-      const email = encodeURIComponent(formData.email);
-      window.location.href = STRIPE_PAYMENT_LINK + '?prefilled_email=' + email;
-    });
+        // Collect form data
+        var formData = {
+          name: document.getElementById('name').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          type: document.getElementById('type').value,
+          working_on: document.getElementById('working_on').value.trim(),
+          revenue: revenueChecked.value,
+          main_problem: document.getElementById('main_problem').value.trim(),
+          website: document.getElementById('website').value.trim(),
+          anything_else: document.getElementById('anything_else').value.trim()
+        };
+
+        // Store in localStorage
+        try { localStorage.setItem('topridge_booking', JSON.stringify(formData)); } catch(ex) {}
+
+        // Send to webhook if configured
+        if (window.TOPRIDGE_WEBHOOK_URL) {
+          try {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', window.TOPRIDGE_WEBHOOK_URL, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(formData));
+          } catch(ex) {}
+        }
+
+        // Redirect to Stripe
+        btn.textContent = 'Redirecting to payment...';
+        btn.disabled = true;
+        window.location.href = STRIPE_URL;
+      });
+    })();
   </script>
 </body>
 </html>
