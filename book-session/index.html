@@ -343,31 +343,31 @@
           return;
         }
 
-        // Collect form data
+        // Collect form data matching webhook schema
         var formData = {
           name: document.getElementById('name').value.trim(),
           email: document.getElementById('email').value.trim(),
           phone: document.getElementById('phone').value.trim(),
-          type: document.getElementById('type').value,
-          working_on: document.getElementById('working_on').value.trim(),
-          revenue: revenueChecked.value,
-          main_problem: document.getElementById('main_problem').value.trim(),
+          businessType: document.getElementById('type').value,
+          workingOn: document.getElementById('working_on').value.trim(),
+          revenueStage: revenueChecked.value,
+          mainProblem: document.getElementById('main_problem').value.trim(),
           website: document.getElementById('website').value.trim(),
-          anything_else: document.getElementById('anything_else').value.trim()
+          specificTopics: document.getElementById('anything_else').value.trim(),
+          source: 'TopRidge Strategy Session Form'
         };
 
         // Store in localStorage
         try { localStorage.setItem('topridge_booking', JSON.stringify(formData)); } catch(ex) {}
 
-        // Send to webhook if configured
-        if (window.TOPRIDGE_WEBHOOK_URL) {
-          try {
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', window.TOPRIDGE_WEBHOOK_URL, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(formData));
-          } catch(ex) {}
-        }
+        // Send to Google Sheets webhook
+        var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwm9sSqQ6VeDjaRAPWXKsEpXOcKZnSL5dyoskVQCNSSFBwyzCS4cZFdeV16uFE_KgPDoA/exec';
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', WEBHOOK_URL, true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify(formData));
+        } catch(ex) {}
 
         // Redirect to Stripe
         btn.textContent = 'Redirecting to payment...';
