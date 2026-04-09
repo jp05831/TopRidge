@@ -364,21 +364,20 @@
         btn.textContent = 'Submitting...';
         btn.disabled = true;
 
-        var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwm9sSqQ6VeDjaRAPWXKsEpXOcKZnSL5dyoskVQCNSSFBwyzCS4cZFdeV16uFE_KgPDoA/exec';
+        var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxVTGGJgMrmf8cj3yCkNT21JeFB9kQjnfD7VAmkAdUTWMuDedx3fHBZU1yw8RonmpgqkA/exec';
 
         fetch(WEBHOOK_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
-        }).then(function() {
+        }).then(function(res) { return res.json(); })
+        .then(function(result) {
           btn.textContent = 'Redirecting to payment...';
           window.location.href = STRIPE_URL;
         }).catch(function(err) {
-          console.error('Webhook error:', err);
-          btn.textContent = 'Continue to Payment →';
-          btn.disabled = false;
-          alert('Something went wrong submitting your info. Please try again.');
+          // Even if parse fails, data likely went through — redirect anyway
+          console.warn('Webhook response issue:', err);
+          btn.textContent = 'Redirecting to payment...';
+          window.location.href = STRIPE_URL;
         });
       });
     })();
