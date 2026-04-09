@@ -386,13 +386,7 @@
       submitBtn.disabled = true;
 
       // WEBHOOK_URL placeholder — replace with your Google Apps Script Web App URL
-      var WEBHOOK_URL = '__WEBHOOK_URL__';
-
-      if (WEBHOOK_URL === '__WEBHOOK_URL__') {
-        // No webhook set yet — just show success
-        showSuccess();
-        return;
-      }
+      var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby6zeYPdmMhPFIOzTqc-dKTYKbUU43eBS2kt5vZxvHhUB5viynIIKp08WISzEJHPMJ7kw/exec';
 
       fetch(WEBHOOK_URL, {
         method: 'POST',
