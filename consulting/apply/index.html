@@ -348,33 +348,39 @@
       }
 
       var formData = {
-        q1_working_on: document.getElementById('q1').value.trim(),
-        q2_improve_fix: document.getElementById('q2').value.trim(),
-        q3_getting_clients: document.getElementById('q3').value.trim(),
-        q4_frustrating: document.getElementById('q4').value.trim(),
-        q5_why_advisory: document.getElementById('q5').value.trim(),
-        form: 'ongoing_advisory'
+        building: document.getElementById('q1').value.trim(),
+        improving: document.getElementById('q2').value.trim(),
+        acquisition: document.getElementById('q3').value.trim(),
+        frustration: document.getElementById('q4').value.trim(),
+        whyAdvisory: document.getElementById('q5').value.trim(),
+        source: 'TopRidge Advisory Form'
       };
 
       // Store locally
       try { localStorage.setItem('topridge_advisory', JSON.stringify(formData)); } catch(ex) {}
 
-      // Send to webhook if configured
-      if (window.TOPRIDGE_WEBHOOK_URL) {
-        try {
-          var xhr = new XMLHttpRequest();
-          xhr.open('POST', window.TOPRIDGE_WEBHOOK_URL, true);
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.send(JSON.stringify(formData));
-        } catch(ex) {}
-      }
+      // Disable submit button
+      var submitBtn = document.querySelector('.step.active .btn-primary');
+      if (submitBtn) { submitBtn.textContent = 'Submitting...'; submitBtn.disabled = true; }
 
-      // Show success + open Calendly popup
+      // Send to Google Sheets webhook, then show success
+      var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzGTFm4iTHhOUYlE-ySq8QQybsQeYPK2vm-C0hjhA9lDg_cn-87wj4bI-vQ7N_pWJgQQA/exec';
+
+      fetch(WEBHOOK_URL, {
+        method: 'POST',
+        body: JSON.stringify(formData)
+      }).then(function() {
+        showSuccess();
+      }).catch(function(err) {
+        console.warn('Webhook response issue:', err);
+        showSuccess();
+      });
+    }
+
+    function showSuccess() {
       document.getElementById('formArea').style.display = 'none';
       var successEl = document.getElementById('successState');
       successEl.classList.add('active');
-
-      // Auto-open Calendly popup after short delay
       setTimeout(openCalendly, 800);
     }
 
