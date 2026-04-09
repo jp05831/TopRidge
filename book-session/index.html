@@ -360,19 +360,26 @@
         // Store in localStorage
         try { localStorage.setItem('topridge_booking', JSON.stringify(formData)); } catch(ex) {}
 
-        // Send to Google Sheets webhook
-        var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwm9sSqQ6VeDjaRAPWXKsEpXOcKZnSL5dyoskVQCNSSFBwyzCS4cZFdeV16uFE_KgPDoA/exec';
-        try {
-          var xhr = new XMLHttpRequest();
-          xhr.open('POST', WEBHOOK_URL, true);
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.send(JSON.stringify(formData));
-        } catch(ex) {}
-
-        // Redirect to Stripe
-        btn.textContent = 'Redirecting to payment...';
+        // Send to Google Sheets webhook, then redirect to Stripe
+        btn.textContent = 'Submitting...';
         btn.disabled = true;
-        window.location.href = STRIPE_URL;
+
+        var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwm9sSqQ6VeDjaRAPWXKsEpXOcKZnSL5dyoskVQCNSSFBwyzCS4cZFdeV16uFE_KgPDoA/exec';
+
+        fetch(WEBHOOK_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        }).then(function() {
+          btn.textContent = 'Redirecting to payment...';
+          window.location.href = STRIPE_URL;
+        }).catch(function(err) {
+          console.error('Webhook error:', err);
+          btn.textContent = 'Continue to Payment →';
+          btn.disabled = false;
+          alert('Something went wrong submitting your info. Please try again.');
+        });
       });
     })();
   </script>
